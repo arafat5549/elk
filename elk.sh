@@ -3,10 +3,10 @@
 # KIBANA_VERSION=kibana-6.3.0
 # REDIS_VERSION=redis-4.0.10
 
-_HOME=~/elk #/opt/
-
+_HOME=/opt 
 
 _elksetup(){
+	#cd $EL_HOME
     if [ ! -d "elasticsearch-5.3.0" ]; then
     	wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.3.0.tar.gz
         tar -xf elasticsearch-5.3.0.tar.gz
@@ -33,9 +33,11 @@ _elksetup(){
 		#daemon
 		sed -i 's/daemonize no/daemonize yes/' 	$_HOME/redis-4.0.10/redis.conf
 		sed -i 's/# requirepass foobared/requirepass wyy/' 	$_HOME/redis-4.0.10/redis.conf
-
 	fi
+	c#d -
  }
+
+
 
  _ruby(){
  	echo "ruby"
@@ -50,12 +52,11 @@ _elksetup(){
  }
 
  _sec(){
+	cd $_HOME
+
  	groupadd elsearch
-	useradd elsearch -g elsearch -p elasticsearch
-
-	cd ~/elk
-	chown -R elsearch:elsearch  elasticsearch
-
+	useradd elsearch -g elsearch -p elasticsearch-5.3.0
+	chown -R elsearch:elsearch  elasticsearch-5.3.0
  }
 
 if [[ $1 = "sec" ]]; then
@@ -116,7 +117,6 @@ if [[ $1 = "run" ]]; then
 	fi
 	./logstash-5.3.0/bin/logstash  -f conf/logstash.conf 
 	echo $psid,$psid2,$psid3
-
 
 fi
 
