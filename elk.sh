@@ -84,7 +84,7 @@ if [[ $1 = "run" ]]; then
 		echo "es is running"
 		kill -9 $psid
 	fi
-	./elasticsearch-5.3.0/bin/elasticsearch -d
+	./elasticsearch-5.3.0/bin/elasticsearch -Ees.insecure.allow.root=true -d
 
 
 	psid3=$(ps aux | grep redis | awk '$11!="grep"{print $2}')
