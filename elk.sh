@@ -123,7 +123,7 @@ _es(){
 		echo "es is running"
 		kill -9 $psid
 	fi
-	su elsearch  && ./elasticsearch-5.3.0/bin/elasticsearch -d
+	 ./elasticsearch-5.3.0/bin/elasticsearch -d
 }
 
 if [[ $1 = "es" ]]; then
@@ -131,6 +131,7 @@ if [[ $1 = "es" ]]; then
 fi
 
 if [[ $1 = "run" ]]; then
+	_es
 
 	cd $_HOME
 	psid3=$(ps aux | grep redis | awk '$11!="grep"{print $2}')
@@ -146,9 +147,8 @@ if [[ $1 = "run" ]]; then
 		echo "logstash is running"
 		kill -9 $psid2
 	fi
-	./logstash-5.3.0/bin/logstash  -f /opt/conf/logstash.conf 
-
-	#nohup ./logstash-5.3.0/bin/logstash  -f conf/logstash.conf  &> /dev/null
+	#./logstash-5.3.0/bin/logstash  -f ~/elk/conf/logstash.conf 
+	nohup ./logstash-5.3.0/bin/logstash  -f ~/elk/conf/logstash.conf  &> /dev/null
 
 	#echo $psid,$psid2,$psid3
 
