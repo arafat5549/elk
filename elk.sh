@@ -3,7 +3,7 @@
 # KIBANA_VERSION=kibana-6.3.0
 # REDIS_VERSION=redis-4.0.10
 
-_HOME=/Users/arafat/elk #/opt/
+_HOME=~/elk #/opt/
 
 
 _elksetup(){
@@ -49,6 +49,9 @@ _elksetup(){
  	#sed -i 's/# requirepass foobared/requirepass wyy/' 	$_HOME/redis-4.0.10/redis.conf
  }
 
+if [[ $1 = "git" ]]; then
+	git clone https://github.com/arafat5549/elk.git
+fi
 
 if [[ $1 = "ruby" ]]; then
 	_ruby
