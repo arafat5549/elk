@@ -51,10 +51,10 @@ _elksetup(){
 
  _sec(){
  	groupadd elsearch
-	useradd elsearch -g elsearch -p elasticsearch
+	useradd elsearch -g elsearch -p elasticsearch-5.3.0
 
 	cd ~/elk
-	chown -R elsearch:elsearch  elasticsearch
+	chown -R elsearch:elsearch  elasticsearch-5.3.0
 
  }
 
