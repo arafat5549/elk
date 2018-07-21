@@ -41,8 +41,8 @@ _elksetup(){
 		cd redis-4.0.10
 		make
 		#daemon
-		sed -i 's/daemonize no/daemonize yes/' 	redis-4.0.10/redis.conf
-		sed -i 's/# requirepass foobared/requirepass wyy/' 	redis-4.0.10/redis.conf
+		sed -i 's/daemonize no/daemonize yes/' 	$_HOME/redis-4.0.10/redis.conf
+		sed -i 's/# requirepass foobared/requirepass wyy/' 	$_HOME/redis-4.0.10/redis.conf
 	fi
  }
 
@@ -138,7 +138,7 @@ if [[ $1 = "run" ]]; then
 		echo "redis is running"
 		kill -9 $psid3
 	fi
-	./redis-4.0.10/src/redis-server redis-4.0.10/redis.conf
+	./redis-4.0.10/src/redis-server $_HOME/redis-4.0.10/redis.conf
 
 
 	psid2=$(ps aux | grep logstash-5.3.0 | awk '$11!="grep"{print $2}')
@@ -146,7 +146,10 @@ if [[ $1 = "run" ]]; then
 		echo "logstash is running"
 		kill -9 $psid2
 	fi
-	./logstash-5.3.0/bin/logstash  -f conf/logstash.conf 
+	./logstash-5.3.0/bin/logstash  -f /opt/conf/logstash.conf 
+
+	#nohup ./logstash-5.3.0/bin/logstash  -f conf/logstash.conf  &> /dev/null
+
 	#echo $psid,$psid2,$psid3
 
 fi
