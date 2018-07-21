@@ -1,37 +1,43 @@
-.DS_Store
-.gitconfig
-.bash_history
-.minttyrc
+# .DS_Store
+# .gitconfig
+# .bash_history
+# .minttyrc
 
-fonts/
-fonts/*
-.codeintel/
-.codeintel/*
-.ssh/
-.ssh/*
-.local
-.local/*
-.cache/
-.cache/*
-.wget-hsts
+# fonts/
+# fonts/*
+# .codeintel/
+# .codeintel/*
+# .ssh/
+# .ssh/*
+# .local
+# .local/*
+# .cache/
+# .cache/*
+# .wget-hsts
 
-.viminfo
-.z
-.zsh_history
-.zcompdump*
-.zsh-update
-.oh-my-zsh/
-.oh-my-zsh/*
+# .viminfo
+# .z
+# .zsh_history
+# .zcompdump*
+# .zsh-update
+# .oh-my-zsh/
+# .oh-my-zsh/*
 
-#.zsh/
-.zsh/*
-!.zsh/custom/
-!.zsh/custom/*
+# #.zsh/
+# .zsh/*
+# !.zsh/custom/
+# !.zsh/custom/*
 
-#
-elastic*
-elastic*/
-logstash*
-logstash*/
-redis*
-redis*/
+# #
+# elastic*
+# elastic*/
+# logstash*
+# logstash*/
+# redis*
+# redis*/
+
+/*
+!elk.sh
+!conf/
+!conf/*
+	
