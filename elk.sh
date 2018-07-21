@@ -13,7 +13,7 @@ _elksetup(){
     	fi
 
     	tar -xf elasticsearch-5.3.0.tar.gz
-
+    	_sed
 	fi
 
     if [ ! -d "logstash-5.3.0" ]; then
@@ -47,8 +47,8 @@ _elksetup(){
  }
 
 _sed(){
-	#sed -i 's/daemonize no/daemonize yes/' 	redis-4.0.10/redis.conf
-	#sed -i 's/daemonize no/daemonize yes/' 	redis-4.0.10/redis.conf
+	sed -i 's/-Xms2g/-Xms1g/' 	$_HOME/elasticsearch-5.3.0/config/jvm.options
+	sed -i 's/-Xmx2g/-Xms1g/' 	$_HOME/elasticsearch-5.3.0/config/jvm.options
 }
 
  _ruby(){
@@ -126,7 +126,7 @@ _es(){
 	su elsearch  && ./elasticsearch-5.3.0/bin/elasticsearch -d
 }
 
-if [[ $1 = "run" ]]; then
+if [[ $1 = "es" ]]; then
    _es
 fi
 
