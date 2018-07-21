@@ -1,13 +1,12 @@
-EK_VERSION=elasticsearch-5.3.0
-LS_VERSION=logstash-5.3.0
-KIBANA_VERSION=kibana-6.3.0
-REDIS_VERSION=redis-4.0.10
+# EK_VERSION=elasticsearch-5.3.0
+# LS_VERSION=logstash-5.3.0
+# KIBANA_VERSION=kibana-6.3.0
+# REDIS_VERSION=redis-4.0.10
 
- _HOME=/Users/arafat/elk #/opt/
+_HOME=/Users/arafat/elk #/opt/
 
 
 _elksetup(){
-    #安装ruby
     if [ ! -d "elasticsearch-5.3.0" ]; then
     	wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.3.0.tar.gz
         tar -xf elasticsearch-5.3.0.tar.gz
@@ -21,8 +20,8 @@ _elksetup(){
 	fi	
 
 	if [ ! -d "kibana-6.3.0" ]; then
-    	#wget https://artifacts.elastic.co/downloads/kibana/kibana-6.3.0-linux-x86_64.tar.gz
-    	echo $KIBANA_VERSION
+    	wget https://artifacts.elastic.co/downloads/kibana/kibana-6.3.0-linux-x86_64.tar.gz
+    	tar -xf kibana-6.3.0-linux-x86_64.tar.gz
 	
     fi
 	
@@ -35,22 +34,24 @@ _elksetup(){
 		sed -i 's/daemonize no/daemonize yes/' 	$_HOME/redis-4.0.10/redis.conf
 		sed -i 's/# requirepass foobared/requirepass wyy/' 	$_HOME/redis-4.0.10/redis.conf
 
-
 	fi
+ }
+
+ _ruby(){
+ 	echo "ruby"
+ 	#安装ruby
     #gem install protoc
-    #gem install ruby-protocol-buffers
+	#gem install ruby-protocol-buffers
  }
 
  _test(){
  	echo "Test"
  	#sed -i 's/# requirepass foobared/requirepass wyy/' 	$_HOME/redis-4.0.10/redis.conf
-
  }
 
 
-
-if [[ $1 = "test" ]]; then
-	_test
+if [[ $1 = "ruby" ]]; then
+	_ruby
 	#sed -i 's/daemonize no/daemonize yes/' 	$_HOME/redis-4.0.10/redis.conf
 fi
 
