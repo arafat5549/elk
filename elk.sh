@@ -49,6 +49,15 @@ _elksetup(){
  	#sed -i 's/# requirepass foobared/requirepass wyy/' 	$_HOME/redis-4.0.10/redis.conf
  }
 
+ _sec(){
+ 	groupadd elsearch
+	useradd elsearch -g elsearch -p elasticsearch
+
+	cd ~/elk
+	chown -R elsearch:elsearch  elasticsearch
+
+ }
+
 if [[ $1 = "git" ]]; then
 	git clone https://github.com/arafat5549/elk.git
 fi
@@ -84,9 +93,10 @@ if [[ $1 = "run" ]]; then
 		echo "es is running"
 		kill -9 $psid
 	fi
+	su elsearch 
 	./elasticsearch-5.3.0/bin/elasticsearch -d
-
-
+	
+	su root
 	psid3=$(ps aux | grep redis | awk '$11!="grep"{print $2}')
 	if [[ $psid3 != "" ]]; then
 		echo "redis is running"
