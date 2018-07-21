@@ -43,7 +43,7 @@ _elksetup(){
 
  _test(){
  	echo "Test"
- 	sed -i 's/# requirepass foobared/requirepass wyy/' 	$_HOME/redis-4.0.10/redis.conf
+ 	#sed -i 's/# requirepass foobared/requirepass wyy/' 	$_HOME/redis-4.0.10/redis.conf
 
  }
 
