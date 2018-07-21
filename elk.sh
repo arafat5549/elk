@@ -8,35 +8,48 @@ _HOME=/opt
 _elksetup(){
 	#cd $EL_HOME
     if [ ! -d "elasticsearch-5.3.0" ]; then
-    	wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.3.0.tar.gz
-        tar -xf elasticsearch-5.3.0.tar.gz
-        #rm elasticsearch-5.3.0.tar.gz
+    	if [[ ! -f "elasticsearch-5.3.0.tar.gz" ]]; then
+    		wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.3.0.tar.gz
+    	fi
+
+    	tar -xf elasticsearch-5.3.0.tar.gz
+
 	fi
 
     if [ ! -d "logstash-5.3.0" ]; then
-       wget https://artifacts.elastic.co/downloads/logstash/logstash-5.3.0.tar.gz
-   	   tar -xf logstash-5.3.0.tar.gz
-   	   #rm logstash-5.3.0.tar.gz
+    	if [[ ! -f "logstash-5.3.0.tar.gz" ]]; then
+    		wget https://artifacts.elastic.co/downloads/logstash/logstash-5.3.0.tar.gz
+    	fi
+    	tar -xf logstash-5.3.0.tar.gz
+
 	fi	
 
 	if [ ! -d "kibana-6.3.0" ]; then
-    		wget https://artifacts.elastic.co/downloads/kibana/kibana-6.3.0-linux-x86_64.tar.gz
-	    	tar -xf kibana-6.3.0-linux-x86_64.tar.gz
-	
-        fi
+		if [[ ! -f "kibana-6.3.0-linux-x86_64.tar.gz" ]]; then
+			wget https://artifacts.elastic.co/downloads/kibana/kibana-6.3.0-linux-x86_64.tar.gz
+		fi
+		tar -xf kibana-6.3.0-linux-x86_64.tar.gz
+
+    fi
 	
 	if [ ! -d "redis-4.0.10" ]; then
-		wget http://download.redis.io/releases/redis-4.0.10.tar.gz
+		if [[ ! -f "redis-4.0.10.tar.gz" ]]; then
+			wget http://download.redis.io/releases/redis-4.0.10.tar.gz
+		fi
+
 		tar -xf redis-4.0.10.tar.gz
 		cd redis-4.0.10
 		make
 		#daemon
-		sed -i 's/daemonize no/daemonize yes/' 	$_HOME/redis-4.0.10/redis.conf
-		sed -i 's/# requirepass foobared/requirepass wyy/' 	$_HOME/redis-4.0.10/redis.conf
+		sed -i 's/daemonize no/daemonize yes/' 	redis-4.0.10/redis.conf
+		sed -i 's/# requirepass foobared/requirepass wyy/' 	redis-4.0.10/redis.conf
 	fi
  }
 
-
+_sed(){
+	#sed -i 's/daemonize no/daemonize yes/' 	redis-4.0.10/redis.conf
+	#sed -i 's/daemonize no/daemonize yes/' 	redis-4.0.10/redis.conf
+}
 
  _ruby(){
  	echo "ruby"
@@ -71,6 +84,7 @@ if [[ $1 = "ruby" ]]; then
 fi
 
 if [[ $1 = "setup" ]]; then
+	#cd $_HOME
  	_elksetup
 fi
 
@@ -83,23 +97,42 @@ if [[ $1 = "state" ]]; then
 	echo $psid2
 	echo $psid3
 
+	if [[ $2 = "kill" ]]; then
+		if [[ $psid != "" ]]; then
+			echo "kill es"
+			kill -9 $psid
+		fi
+
+		if [[ $psid2 != "" ]]; then
+			echo "kill logstash"
+			kill -9 $psid2
+		fi
+
+		if [[ $psid3 != "" ]]; then
+			echo "kill redis"
+			kill -9 $psid3
+		fi
+	fi
+
 fi
 
-if [[ $1 = "run" ]]; then
-	#echo $_HOME
-
+_es(){
 	cd $_HOME
-
 	psid=$(ps aux | grep elasticsearch-5.3.0 | awk '$11!="grep"{print $2}')
-
 	if [[ $psid != "" ]]; then
 		echo "es is running"
 		kill -9 $psid
 	fi
-	su elsearch 
-	./elasticsearch-5.3.0/bin/elasticsearch -d
-	su root
+	su elsearch  && ./elasticsearch-5.3.0/bin/elasticsearch -d
+}
 
+if [[ $1 = "run" ]]; then
+   _es
+fi
+
+if [[ $1 = "run" ]]; then
+
+	cd $_HOME
 	psid3=$(ps aux | grep redis | awk '$11!="grep"{print $2}')
 	if [[ $psid3 != "" ]]; then
 		echo "redis is running"
@@ -114,7 +147,7 @@ if [[ $1 = "run" ]]; then
 		kill -9 $psid2
 	fi
 	./logstash-5.3.0/bin/logstash  -f conf/logstash.conf 
-	echo $psid,$psid2,$psid3
+	#echo $psid,$psid2,$psid3
 
 fi
 
