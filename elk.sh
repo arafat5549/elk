@@ -58,6 +58,10 @@ _elksetup(){
 
  }
 
+if [[ $1 = "sec" ]]; then
+	_sec
+fi
+
 if [[ $1 = "git" ]]; then
 	git clone https://github.com/arafat5549/elk.git
 fi
@@ -95,11 +99,8 @@ if [[ $1 = "run" ]]; then
 	fi
 	su elsearch 
 	./elasticsearch-5.3.0/bin/elasticsearch -d
-	
 	su root
 
-
->>>>>>> bb05e22bdcae0b2d76759f5ccec7da0275961e6d
 	psid3=$(ps aux | grep redis | awk '$11!="grep"{print $2}')
 	if [[ $psid3 != "" ]]; then
 		echo "redis is running"
@@ -114,7 +115,6 @@ if [[ $1 = "run" ]]; then
 		kill -9 $psid2
 	fi
 	./logstash-5.3.0/bin/logstash  -f conf/logstash.conf 
-
 	echo $psid,$psid2,$psid3
 
 
