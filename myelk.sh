@@ -139,7 +139,7 @@ _logstash(){
 
 _kafka_conf(){
 	brokerid=$1
-	ipc=$2   #119.29.238.193
+	ipc=$2   
 	sed -i "s/broker.id=0/broker.id=$brokerid/"  $_HOME/kafka_2.11-1.1.0/config/server.properties
 	sed -i "s@#listeners=PLAINTEXT://:9092@listeners=PLAINTEXT://:9092@" $_HOME/kafka_2.11-1.1.0/config/server.properties
 	sed -i "s/zookeeper.connect=localhost:2181/zookeeper.connect=$ipc:2181/" $_HOME/kafka_2.11-1.1.0/config/server.properties	
@@ -147,14 +147,12 @@ _kafka_conf(){
 	sed -i "s/tickTime=2000//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	sed -i "s/initLimit=10//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	sed -i "s/syncLimit=5//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
-	#sed -i "s/server.1=220.160.58.26:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
-	sed -i "s/server.1=$ipc:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	sed -i "s/server.$brokerid=$ipc:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 
 	echo "tickTime=2000" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	echo "initLimit=10" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	echo "syncLimit=5" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
-	#echo "server.1=220.160.58.26:2888:3888" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
-	echo "server.1=$ipc:2888:3888" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	echo "server.$brokerid=$ipc:2888:3888" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 
 	sed -i "s/broker.id=0/broker.id=$brokerid/" /tmp/kafka-logs/meta.properties
 
@@ -181,9 +179,10 @@ _kafka(){
 			#sed -i 's/KAFKA_HEAP_OPTS="-Xmx512M -Xms512M"/KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"/' 	$_HOME/kafka_2.11-1.1.0/bin/kafka-zookeeper-start.sh
 		;;
 		conf)
-			if [[ $2 != "" &&  $3 != "" ]]; then
-				#statements
-				_kafka_conf $2 $3
+			if [ $2 == "1" ]; then
+				_kafka_conf $2  119.29.238.193 #腾讯ip
+			elif [ $2 == "2" ]; then
+				_kafka_conf $2  35.229.142.60  #google ip
 			fi
 			
 		;;
