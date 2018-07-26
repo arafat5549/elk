@@ -126,12 +126,31 @@ _es(){
 	 ./elasticsearch-5.3.0/bin/elasticsearch -d
 }
 
-if [[ $1 = "es" ]]; then
-   _es
-fi
+_kibana(){
+	cd $_HOME
+	case "$1" in  
+		sense) 
+			./kibana-6.3.0-linux-x86_64/bin.kibana plugin --install elastic/sense
+		 ;; 
+
+		 run)
+		 	./kibana-6.3.0-linux-x86_64/bin.kibana
+		 ;;
+		
+	esac
+}
+
+# if [[ $1 = "es" ]]; then
+#    _es
+# fi
+
+case "$1" in  
+	es) _es ;;
+    kibana)  _kibana $2 ;;
+esac
 
 if [[ $1 = "run" ]]; then
-	_es
+	#_es
 
 	cd $_HOME
 	psid3=$(ps aux | grep redis | awk '$11!="grep"{print $2}')
