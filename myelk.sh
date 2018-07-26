@@ -67,7 +67,7 @@ _redis(){
 			vim $_HOME/redis-4.0.10/redis.conf
 		;;
 		setup)
-			if [[ ! -f "redis-4.0.10.tar.gz" ]]; then
+			if [ ! -f "redis-4.0.10.tar.gz" ]; then
 				wget http://download.redis.io/releases/redis-4.0.10.tar.gz
 			fi
 			tar -xf redis-4.0.10.tar.gz
@@ -119,7 +119,7 @@ _logstash(){
 		;;
 		setup)
 		    if [ ! -d "logstash-5.3.0" ]; then
-		    	if [[ ! -f "logstash-5.3.0.tar.gz" ]]; then
+		    	if [ ! -f "logstash-5.3.0.tar.gz" ]; then
 		    		wget https://artifacts.elastic.co/downloads/logstash/logstash-5.3.0.tar.gz
 		    	fi
 		    	tar -xf logstash-5.3.0.tar.gz
@@ -193,7 +193,7 @@ _kafka(){
 		;;
 		setup)
 		    if [ ! -d "kafka_2.11-1.1.0" ]; then
-		    	if [[ ! -f "kafka_2.11-1.1.0.tgz" ]]; then
+		    	if [ ! -f "kafka_2.11-1.1.0.tgz" ]; then
 		    		wget http://www-us.apache.org/dist/kafka/1.1.0/kafka_2.11-1.1.0.tgz
 		    	fi
 		    	tar -xzvf kafka_2.11-1.1.0.tgz
@@ -260,6 +260,9 @@ _initall(){
 
 	_kibana setup
 	_kibana yml
+
+	_kafka setup
+	_kafka yml
 }
 
 
