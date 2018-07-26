@@ -139,7 +139,7 @@ _logstash(){
 
 _kafka_conf(){
 	brokerid=$1
-	ipc=119.29.238.193
+	ipc=$2   #119.29.238.193
 	sed -i "s/broker.id=0/broker.id=$brokerid/"  $_HOME/kafka_2.11-1.1.0/config/server.properties
 	sed -i "s@#listeners=PLAINTEXT://:9092@listeners=PLAINTEXT://:9092@" $_HOME/kafka_2.11-1.1.0/config/server.properties
 	sed -i "s/zookeeper.connect=localhost:2181/zookeeper.connect=$ipc:2181/" $_HOME/kafka_2.11-1.1.0/config/server.properties	
@@ -181,15 +181,11 @@ _kafka(){
 			#sed -i 's/KAFKA_HEAP_OPTS="-Xmx512M -Xms512M"/KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"/' 	$_HOME/kafka_2.11-1.1.0/bin/kafka-zookeeper-start.sh
 		;;
 		conf)
-			#if [[ $2 == "1" ]]; then
-			#	_kafka_conf 1 220.160.58.26
-		    #elif [[ $2 == "2" ]]; then
-		    #	_kafka_conf 2 119.29.238.193							
-			#fi
-			#ipc=$(curl ifconfig.me)
-			#echo $ipc
-			_kafka_conf 2
-
+			if [[ $2 != "" &&  $3 != "" ]]; then
+				#statements
+				_kafka_conf $2 $3
+			fi
+			
 		;;
 		setup)
 		    if [ ! -d "kafka_2.11-1.1.0" ]; then
@@ -343,7 +339,7 @@ case "$1" in
     kibana)  _kibana $2 $3;;
     redis)   _redis $2 $3;;
 	logstash) _logstash $2 $3;;
-	kafka)    _kafka $2 $3;;
+	kafka)    _kafka $2 $3 $4;;
 	ktest)   _kafaka_test $2 $3;;  
 
     init) _initall;;
