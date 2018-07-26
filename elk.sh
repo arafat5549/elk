@@ -3,7 +3,15 @@
 # KIBANA_VERSION=kibana-6.3.0
 # REDIS_VERSION=redis-4.0.10
 
-_HOME=/opt 
+computer="";
+_HOME="~/elk";
+case "`uname`" in  
+    CYGWIN*) computer="Cygwin" _HOME=~/elk;;
+    Darwin*) computer="Darwin" _HOME=~/elk;;  
+    (*Linux*) computer="Linux" _HOME=/opt;;  
+esac
+
+echo "HOME:"$_HOME
 
 _elksetup(){
 	#cd $EL_HOME
