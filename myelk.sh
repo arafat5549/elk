@@ -12,49 +12,6 @@ case "`uname`" in
 esac
 
 echo "HOME:"$_HOME
-# _elksetup(){
-# 	#cd $EL_HOME
-#     if [ ! -d "elasticsearch-5.3.0" ]; then
-#     	if [[ ! -f "elasticsearch-5.3.0.tar.gz" ]]; then
-#     		wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.3.0.tar.gz
-#     	fi
-
-#     	tar -xf elasticsearch-5.3.0.tar.gz
-#     	sed -i 's/-Xms2g/-Xms1g/' 	$_HOME/elasticsearch-5.3.0/config/jvm.options
-# 		sed -i 's/-Xmx2g/-Xms1g/' 	$_HOME/elasticsearch-5.3.0/config/jvm.options
-# 	fi
-
-#     if [ ! -d "logstash-5.3.0" ]; then
-#     	if [[ ! -f "logstash-5.3.0.tar.gz" ]]; then
-#     		wget https://artifacts.elastic.co/downloads/logstash/logstash-5.3.0.tar.gz
-#     	fi
-#     	tar -xf logstash-5.3.0.tar.gz
-
-# 	fi	
-
-# 	if [ ! -d "kibana-6.3.0" ]; then
-# 		if [[ ! -f "kibana-6.3.0-darwin-x86_64.tar.gz" ]]; then
-# 			wget https://artifacts.elastic.co/downloads/kibana/kibana-6.3.0-darwin-x86_64.tar.gz
-# 		fi
-# 		#tar -xf kibana-6.3.0-darwin-x86_64.tar.gz kibana-6.3.0
-# 		mkdir kibana-6.3.0
-# 		tar -xvzf kibana-6.3.0-darwin-x86_64.tar.gz -C kibana-6.3.0 --strip-components 1
-
-#     fi
-	
-# 	if [ ! -d "redis-4.0.10" ]; then
-# 		if [[ ! -f "redis-4.0.10.tar.gz" ]]; then
-# 			wget http://download.redis.io/releases/redis-4.0.10.tar.gz
-# 		fi
-
-# 		tar -xf redis-4.0.10.tar.gz
-# 		cd redis-4.0.10
-# 		make
-# 		#daemon
-# 		sed -i 's/daemonize no/daemonize yes/' 	$_HOME/redis-4.0.10/redis.conf
-# 		sed -i 's/# requirepass foobared/requirepass wyy/' 	$_HOME/redis-4.0.10/redis.conf
-# 	fi
-#  }
 
 
  _killproc(){
@@ -83,7 +40,6 @@ echo "HOME:"$_HOME
 
  _sedfile(){
  	#origin=127.0.0.1
-
  	#ip=192.168.0.128
  	#redis
  	sed -i 's/bind 127.0.0.1/bind 192.168.0.128/' 	$_HOME/redis-4.0.10/redis.conf	
@@ -181,6 +137,28 @@ _logstash(){
 	esac	
 }
 
+_kafka_conf(){
+	sed -i "s/broker.id=0/broker.id=$1/"  $_HOME/kafka_2.11-1.1.0/config/server.properties
+	sed -i "s@#listeners=PLAINTEXT://:9092@listeners=PLAINTEXT://$2:9092@" $_HOME/kafka_2.11-1.1.0/config/server.properties
+	sed -i 's/zookeeper.connect=localhost:2181/zookeeper.connect=119.29.238.193:2181, 220.160.58.26:2181, localhost:2181/' $_HOME/kafka_2.11-1.1.0/config/server.properties	
+
+	sed -i "s/tickTime=2000//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	sed -i "s/initLimit=10//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	sed -i "s/syncLimit=5//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	sed -i "s/server.1=220.160.58.26:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	sed -i "s/server.2=119.29.238.193:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+
+	echo "tickTime=2000" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	echo "initLimit=10" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	echo "syncLimit=5" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	echo "server.1=220.160.58.26:2888:3888" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	echo "server.2=119.29.238.193:2888:3888" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+
+	mkdir $_HOME/kafka_2.11-1.1.0/zookeeper
+	echo "$1" >  $_HOME/kafka_2.11-1.1.0/zookeeper/myid
+
+}
+
 _kafka(){
 	cd $_HOME
 	case "$1" in
@@ -188,8 +166,13 @@ _kafka(){
 			sed -i 's/KAFKA_HEAP_OPTS="-Xmx1G -Xms1G"/KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"/' 	$_HOME/kafka_2.11-1.1.0/bin/kafka-server-start.sh
 			#sed -i 's/KAFKA_HEAP_OPTS="-Xmx512M -Xms512M"/KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"/' 	$_HOME/kafka_2.11-1.1.0/bin/kafka-zookeeper-start.sh
 		;;
-		openconf)
-			
+		conf)
+			if [[ $2 == "1" ]]; then
+				_kafka_conf 1 220.160.58.26
+		    elif [[ $2 == "2" ]]; then
+		    	_kafka_conf 2 119.29.238.193							
+			fi
+
 		;;
 		setup)
 		    if [ ! -d "kafka_2.11-1.1.0" ]; then
