@@ -138,40 +138,57 @@ _logstash(){
 }
 
 _kafka_conf(){
-	sed -i "s/broker.id=0/broker.id=$1/"  $_HOME/kafka_2.11-1.1.0/config/server.properties
-	sed -i "s@#listeners=PLAINTEXT://:9092@listeners=PLAINTEXT://$2:9092@" $_HOME/kafka_2.11-1.1.0/config/server.properties
-	sed -i 's/zookeeper.connect=localhost:2181/zookeeper.connect=119.29.238.193:2181, 220.160.58.26:2181, localhost:2181/' $_HOME/kafka_2.11-1.1.0/config/server.properties	
+	brokerid=$1
+	ipc=119.29.238.193
+	sed -i "s/broker.id=0/broker.id=$brokerid/"  $_HOME/kafka_2.11-1.1.0/config/server.properties
+	sed -i "s@#listeners=PLAINTEXT://:9092@listeners=PLAINTEXT://:9092@" $_HOME/kafka_2.11-1.1.0/config/server.properties
+	sed -i "s/zookeeper.connect=localhost:2181/zookeeper.connect=$ipc:2181/" $_HOME/kafka_2.11-1.1.0/config/server.properties	
 
 	sed -i "s/tickTime=2000//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	sed -i "s/initLimit=10//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	sed -i "s/syncLimit=5//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
-	sed -i "s/server.1=220.160.58.26:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
-	sed -i "s/server.2=119.29.238.193:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	#sed -i "s/server.1=220.160.58.26:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	sed -i "s/server.1=$ipc:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 
 	echo "tickTime=2000" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	echo "initLimit=10" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	echo "syncLimit=5" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
-	echo "server.1=220.160.58.26:2888:3888" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
-	echo "server.2=119.29.238.193:2888:3888" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	#echo "server.1=220.160.58.26:2888:3888" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	echo "server.1=$ipc:2888:3888" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 
-	mkdir $_HOME/kafka_2.11-1.1.0/zookeeper
-	echo "$1" >  $_HOME/kafka_2.11-1.1.0/zookeeper/myid
+	sed -i "s/broker.id=0/broker.id=$brokerid/" /tmp/kafka-logs/meta.properties
 
+}
+
+_kafaka_test(){
+	#$_HOME/kafka_2.11-1.1.0/bin/kafka-console-producer.sh --broker-list $1 --topic $2
+	#ipc=119.29.238.193
+	ipc=220.160.58.26
+	topic=test2
+	#$_HOME/kafka_2.11-1.1.0/bin/kafka-topics.sh --create --zookeeper "$ipc:2181" --replication-factor 1 --partitions 1 --topic $topic
+	$_HOME/kafka_2.11-1.1.0/bin/kafka-topics.sh --list --zookeeper "$ipc:2181"
 }
 
 _kafka(){
 	cd $_HOME
 	case "$1" in
+		test)
+			_kafaka_test 119.29.238.193:9092 test
+
+		;;
 		yml)
 			sed -i 's/KAFKA_HEAP_OPTS="-Xmx1G -Xms1G"/KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"/' 	$_HOME/kafka_2.11-1.1.0/bin/kafka-server-start.sh
 			#sed -i 's/KAFKA_HEAP_OPTS="-Xmx512M -Xms512M"/KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"/' 	$_HOME/kafka_2.11-1.1.0/bin/kafka-zookeeper-start.sh
 		;;
 		conf)
-			if [[ $2 == "1" ]]; then
-				_kafka_conf 1 220.160.58.26
-		    elif [[ $2 == "2" ]]; then
-		    	_kafka_conf 2 119.29.238.193							
-			fi
+			#if [[ $2 == "1" ]]; then
+			#	_kafka_conf 1 220.160.58.26
+		    #elif [[ $2 == "2" ]]; then
+		    #	_kafka_conf 2 119.29.238.193							
+			#fi
+			#ipc=$(curl ifconfig.me)
+			#echo $ipc
+			_kafka_conf 2
 
 		;;
 		setup)
@@ -324,6 +341,7 @@ case "$1" in
     redis)   _redis $2 $3;;
 	logstash) _logstash $2 $3;;
 	kafka)    _kafka $2 $3;;
+	ktest)   _kafaka_test $2 $3;;  
 
     init) _initall;;
     state) _state $2;;
