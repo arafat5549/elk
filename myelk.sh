@@ -137,17 +137,40 @@ _logstash(){
 	esac	
 }
 
+_zookeeper(){
+	cd $_HOME
+	case "$1" in
+		yml)
+			#sed -i 's/-Xms2g/-Xms1g/' 	$_HOME/elasticsearch-5.3.0/config/jvm.options
+			#sed -i 's/-Xmx2g/-Xms1g/' 	$_HOME/elasticsearch-5.3.0/config/jvm.options
+			#open $_HOME/elasticsearch-5.3.0/config/elasticsearch.yml
+		;;
+		setup)
+			wget https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.4.10/zookeeper-3.4.10.tar.gz
+			tar -xf zookeeper-3.4.10.tar.gz
+		;;
+		run) 
+			#_killproc elasticsearch
+		 	#./zookeeper-3.4.10/bin/elasticsearch -d
+		;;
+		stop)
+			_killproc zookeeper
+		;;
+	esac
+}
+
 _kafka_conf(){
 	brokerid=$1
 	ipc=$2   
 	sed -i "s/broker.id=0/broker.id=$brokerid/"  $_HOME/kafka_2.11-1.1.0/config/server.properties
-	sed -i "s@#listeners=PLAINTEXT://:9092@listeners=PLAINTEXT://:9092@" $_HOME/kafka_2.11-1.1.0/config/server.properties
+	sed -i "s@#listeners=PLAINTEXT://:9092@listeners=PLAINTEXT://$ipc:9092@" $_HOME/kafka_2.11-1.1.0/config/server.properties
 	sed -i "s/zookeeper.connect=localhost:2181/zookeeper.connect=$ipc:2181/" $_HOME/kafka_2.11-1.1.0/config/server.properties	
 
 	sed -i "s/tickTime=2000//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	sed -i "s/initLimit=10//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	sed -i "s/syncLimit=5//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	sed -i "s/server.$brokerid=$ipc:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	sed -i "s/broker.id=$brokerid/broker.id=0/" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 
 	echo "tickTime=2000" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	echo "initLimit=10" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
@@ -156,15 +179,21 @@ _kafka_conf(){
 
 	sed -i "s/broker.id=0/broker.id=$brokerid/" /tmp/kafka-logs/meta.properties
 
+	hname=$(hostname)
+	echo "$ipc" >> /etc/hosts
+
 }
 
 _kafaka_test(){
-	#$_HOME/kafka_2.11-1.1.0/bin/kafka-console-producer.sh --broker-list $1 --topic $2
-	#ipc=119.29.238.193
-	ipc=220.160.58.26
-	topic=test2
-	#$_HOME/kafka_2.11-1.1.0/bin/kafka-topics.sh --create --zookeeper "$ipc:2181" --replication-factor 1 --partitions 1 --topic $topic
-	$_HOME/kafka_2.11-1.1.0/bin/kafka-topics.sh --list --zookeeper "$ipc:2181"
+	ipc=119.29.238.193
+	#ipc2=10.135.108.183
+	itopic=topic_cctt_kafka
+	case "$1" in
+	   topic)  	$_HOME/kafka_2.11-1.1.0/bin/kafka-topics.sh --create --zookeeper "$ipc:2181" --replication-factor 1 --partitions 1 --topic $itopic ;;
+       list) 	$_HOME/kafka_2.11-1.1.0/bin/kafka-topics.sh --list --zookeeper "$ipc:2181" ;;
+       prod)    $_HOME/kafka_2.11-1.1.0/bin/kafka-console-producer.sh --broker-list "$ipc:9092" --topic $itopic ;;
+	   consume) $_HOME/kafka_2.11-1.1.0/bin/kafka-console-consumer.sh --bootstrap-server "$ipc:9092"  --topic $itopic --from-beginning;;
+    esac 
 }
 
 _kafka(){
@@ -197,12 +226,12 @@ _kafka(){
 		;;
 		run) 
 			#zkserver
-			$_HOME/kafka_2.11-1.1.0/bin/zookeeper-server-start.sh -daemon $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+			#$_HOME/kafka_2.11-1.1.0/bin/zookeeper-server-start.sh -daemon $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 			#server
 			$_HOME/kafka_2.11-1.1.0/bin/kafka-server-start.sh -daemon $_HOME/kafka_2.11-1.1.0/config/server.properties
 		;;
 		stop)
-			_killproc zookeeper
+			#_killproc zookeeper
 			_killproc kafka
 		;;
 	esac
@@ -339,6 +368,7 @@ case "$1" in
     redis)   _redis $2 $3;;
 	logstash) _logstash $2 $3;;
 	kafka)    _kafka $2 $3 $4;;
+	zookeeper) _zookeeper $2 $3;;
 	ktest)   _kafaka_test $2 $3;;  
 
     init) _initall;;
