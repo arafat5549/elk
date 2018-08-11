@@ -2,6 +2,7 @@
 # LS_VERSION=logstash-5.3.0
 # KIBANA_VERSION=kibana-6.3.0
 # REDIS_VERSION=redis-4.0.10
+NGINX_V=1.14.0
 
 _HOME=~/elk 
 computer="";
@@ -170,7 +171,7 @@ _kafka_conf(){
 	sed -i "s/initLimit=10//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	sed -i "s/syncLimit=5//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	sed -i "s/server.$brokerid=$ipc:2888:3888//" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
-	sed -i "s/broker.id=$brokerid/broker.id=0/" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
+	sed -i "s/brokerid=$brokerid/broker.id=0/" $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 
 	echo "tickTime=2000" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
 	echo "initLimit=10" >> $_HOME/kafka_2.11-1.1.0/config/zookeeper.properties
@@ -272,6 +273,51 @@ _kibana(){
 
 }
 
+_nginx(){
+	cd $_HOME
+	case "$1" in 
+		yml)
+			echo "yml"
+			 
+		;;
+		conf)
+			#open /usr/local/nginx/nginx.conf
+		;;
+		setup)
+			#wget "https://nginx.org/download/nginx-$NGINX_V.tar.gz"
+			#mkdir nginx
+			#tar -xvzf "nginx-$NGINX_V.tar.gz" -C nginx --strip-components 1
+
+			cd nginx
+			# wget https://github.com/madler/zlib/archive/v1.2.1.tar.gz  -O zlib-1.2.1.tar.gz
+			# tar -xvzf zlib-1.2.1.tar.gz
+			# wget https://ftp.pcre.org/pub/pcre/pcre-8.42.tar.gz
+			# tar -xvzf pcre-8.42.tar.gz
+
+
+			./configure --with-http_ssl_module --with-cc-opt="-I/usr/local/Cellar/pcre/8.42/include -I/usr/local/Cellar/openssl/1.0.2o_2/include/openssl" \
+				--with-ld-opt="-L/usr/local/Cellar/pcre/8.42/lib -L/usr/local/Cellar/openssl/1.0.2o_2/lib" \
+				--with-pcre=./pcre-8.42 --with-zlib=./zlib-1.2.1 \
+				--sbin-path=/usr/local/nginx/nginx \
+				--conf-path=/usr/local/nginx/nginx.conf \
+				--pid-path=/usr/local/nginx/nginx.pid
+			#make & make install
+		;;
+		run)
+			sudo /usr/local/nginx/nginx
+		;;
+		stop)
+			sudo /usr/local/nginx/nginx -s stop
+		;;
+		restart)
+			sudo /usr/local/nginx/nginx -s restart
+		;;
+	esac
+}
+
+###################################################################
+##.                   通用区域
+###################################################################
 _initall(){
 	_es setup
 	_es yml
@@ -363,13 +409,15 @@ _state(){
 
 
 case "$1" in  
-	es) _es $2 $2=3 ;;
-    kibana)  _kibana $2 $3;;
-    redis)   _redis $2 $3;;
-	logstash) _logstash $2 $3;;
-	kafka)    _kafka $2 $3 $4;;
+	es)        _es $2 $2=3 ;;
+    kibana)    _kibana $2 $3;;
+    redis)     _redis $2 $3;;
+	logstash)  _logstash $2 $3;;
+	kafka)     _kafka $2 $3 $4;;
 	zookeeper) _zookeeper $2 $3;;
-	ktest)   _kafaka_test $2 $3;;  
+	nginx)     _nginx $2 $3;;
+
+	ktest)     _kafaka_test $2 $3;;  
 
     init) _initall;;
     state) _state $2;;
